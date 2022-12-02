@@ -9,7 +9,7 @@ $(OUTDIR):
 	mkdir -p $(OUTDIR)
 
 $(OUTDIR)/%: src/%.c $(OUTDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf $(OUTDIR)
