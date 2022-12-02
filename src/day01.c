@@ -49,11 +49,9 @@ int strToInt(char *buffer, int *value) {
   if(!localBuff) localBuff = strdup(buffer);
   if(localBuff[0] == '\n' && localBuff[1] == '\n') {
     localBuff += 2;
-    printf("blank\n");
     return 1;
   };
   *value = (int)strtol(localBuff, &endPtr, 10);
-  printf("%d\n", *value);
 
   if(errno) return(-1);
 
@@ -61,12 +59,25 @@ int strToInt(char *buffer, int *value) {
   return 0;
 }
 
+void insertResult(int value, int topThree[3]) {
+  int currentValue = value;
+  int tmp;
+
+  for(size_t i = 0; i < 3; ++i) {
+    if(currentValue > topThree[i]) {
+      tmp = currentValue;
+      currentValue = topThree[i];
+      topThree[i] = tmp;
+    }
+  }
+}
+
 int main(void) {
   char *buffer = NULL;
   int value;
   int conversionResult;
-  int result = 0;
   int tmpResult = 0;
+  int topThree[3] = { 0, 0, 0};
 
   if(getInput(&buffer) <= 0) {
     fprintf(stderr, "Error: failed to read file\n");
@@ -75,15 +86,14 @@ int main(void) {
 
   while ((conversionResult = strToInt(buffer, &value)) != -1) {
     if(conversionResult) {
-      if (tmpResult > result) result = tmpResult;
-      printf("result: %d\n", result);
+      insertResult(tmpResult, topThree);
       tmpResult = 0;
     }
     else
       tmpResult += value;
-    printf("tmp result: %d\n", tmpResult);
   };
 
-  printf("Part 1: %d\n", result);
+  printf("Part 1: %d\n", topThree[0]);
+  printf("Part 2: %d\n", topThree[0] + topThree[1] + topThree[2]);
   return 0;
 }
