@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
+#include "shared/input.c"
 
 #ifdef TEST_INPUT
 char input[] = "1000\n\
@@ -18,29 +18,6 @@ char input[] = "1000\n\
 9000\n\
 \n\
 10000\n";
-
-ssize_t getInput(char **buffer) {
-  ssize_t len = strlen(input);
-  *buffer = input;
-  return len;
-}
-#else
-
-ssize_t getInput(char **buffer) {
-  ssize_t len;
-  FILE *fd = fopen("inputs/day01input.txt", "r");
-  if(!fd) return -1;
-
-  fseek(fd, 0, SEEK_END);
-  len = ftell(fd);
-  fseek(fd, 0, SEEK_SET);
-  *buffer = malloc(sizeof(char) * len + 1);
-
-  fread(*buffer, sizeof(char), len, fd);
-  fclose(fd);
-  (*buffer)[len] = '\0';
-  return len;
-}
 #endif
 
 int strToInt(char *buffer, int *value) {
@@ -79,7 +56,7 @@ int main(void) {
   int tmpResult = 0;
   int topThree[3] = { 0, 0, 0};
 
-  if(getInput(&buffer) <= 0) {
+  if(getInput(&buffer, "day01") <= 0) {
     fprintf(stderr, "Error: failed to read file\n");
     return 1;
   };
