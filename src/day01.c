@@ -95,5 +95,6 @@ int main(void) {
 
   printf("Part 1: %d\n", topThree[0]);
   printf("Part 2: %d\n", topThree[0] + topThree[1] + topThree[2]);
+  free(buffer);
   return 0;
 }
