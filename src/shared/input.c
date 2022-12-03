@@ -4,7 +4,7 @@
 ssize_t getInput(char **buffer, char *fileBase) {
   (void)fileBase;
   ssize_t len = strlen(input);
-  *buffer = input;
+  *buffer = strdup(input);
   return len;
 }
 #else
