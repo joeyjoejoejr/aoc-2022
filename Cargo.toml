@@ -7,6 +7,10 @@ edition = "2021"
 
 [dependencies]
 
+[features]
+default = []
+test_input = []
+
 [[bin]]
 name = "day05"
 path = "src/day05.rs"
@@ -14,3 +18,7 @@ path = "src/day05.rs"
 [[bin]]
 name = "day06"
 path = "src/day06.rs"
+
+[[bin]]
+name = "day07"
+path = "src/day07.rs"
