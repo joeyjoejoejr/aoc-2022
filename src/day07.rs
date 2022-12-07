@@ -79,26 +79,44 @@ impl Node {
 }
 
 impl Node {
-    fn sum_of_dirs_lt(&self, n: usize) -> (usize, usize) {
+    fn sum_of_dirs_lt(&self, n: usize) -> usize {
         let mut sum_of_dirs = 0;
-        let mut total = 0;
         if let Self::Dir { children, .. } = self {
-            total = children
+            sum_of_dirs += children
                 .iter()
-                .map(|child| match *child.borrow() {
-                    Self::Dir { .. } => {
-                        let (total, sum) = child.borrow().sum_of_dirs_lt(n);
-                        sum_of_dirs += sum;
-                        if total <= n {
-                            sum_of_dirs += total
-                        }
-                        total
-                    }
-                    Self::File { size, .. } => size,
-                })
-                .sum();
+                .map(|child| child.borrow().sum_of_dirs_lt(n))
+                .sum::<usize>();
+
+            if self.size() <= n {
+                sum_of_dirs += self.size()
+            }
         }
-        (total, sum_of_dirs)
+        sum_of_dirs
+    }
+
+    fn smallest_dir_gt(&self, n: usize) -> usize {
+        let mut smallest = usize::MAX;
+        if let Self::Dir { children, .. } = self {
+            let size = self.size();
+            for child in children {
+                let child_ref = child.borrow();
+                let child_size = child_ref.smallest_dir_gt(n);
+                if child_size < smallest && child_size > n {
+                    smallest = child_size;
+                }
+            }
+            if size < smallest && size > n {
+                smallest = size;
+            }
+        }
+        smallest
+    }
+
+    fn size(&self) -> usize {
+        match self {
+            Self::Dir { children, .. } => children.iter().map(|child| child.borrow().size()).sum(),
+            Self::File { size, .. } => *size,
+        }
     }
 }
 
@@ -158,8 +176,11 @@ impl FileTree {
     }
 
     fn sum_of_dirs_lt(&self, n: usize) -> usize {
-        let (_, sum) = self.base.sum_of_dirs_lt(n);
-        sum
+        self.base.sum_of_dirs_lt(n)
+    }
+
+    fn smallest_dir_gt(&self, n: usize) -> usize {
+        self.base.smallest_dir_gt(n)
     }
 }
 
@@ -205,9 +226,15 @@ fn main() -> Result<(), Box<dyn Error>> {
         .filter(|c| !c.is_empty())
         .map(str::parse)
         .collect::<Result<Vec<TerminalCommand>, _>>()?;
+
     let file_tree = FileTree::new(&commands);
+
     let result_part1 = file_tree.sum_of_dirs_lt(100_000);
 
+    let needed = 30_000_000 - (70_000_000 - file_tree.base.size());
+    let result_part2 = file_tree.smallest_dir_gt(needed);
+
     println!("Part 1: {result_part1}");
+    println!("Part 2: {result_part2}");
     Ok(())
 }
