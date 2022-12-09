@@ -25,10 +25,12 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 fn main() -> Result<()> {
     let input = get_input()?;
-    let mut head_position = (0, 0);
-    let mut tail_position = (0, 0);
-    let mut visited_positions = HashSet::new();
-    visited_positions.insert(tail_position);
+    let mut positions = vec![(0, 0); 10];
+    let mut short_visited = HashSet::new();
+    let mut long_visited = HashSet::new();
+
+    short_visited.insert(positions[1]);
+    long_visited.insert(positions[9]);
 
     let moves = input
         .lines()
@@ -42,25 +44,33 @@ fn main() -> Result<()> {
     for head_move in moves {
         for _ in 0..head_move.1 {
             match head_move.0 {
-                "U" => head_position.1 -= 1,
-                "D" => head_position.1 += 1,
-                "R" => head_position.0 += 1,
-                "L" => head_position.0 -= 1,
+                "U" => positions[0].1 -= 1,
+                "D" => positions[0].1 += 1,
+                "R" => positions[0].0 += 1,
+                "L" => positions[0].0 -= 1,
                 _ => unreachable!(),
             }
+            for i in 1..positions.len() {
+                let first = positions[i - 1];
+                let mut next = &mut positions[i];
 
-            let x_distance: i32 = head_position.0 - tail_position.0;
-            let y_distance: i32 = head_position.1 - tail_position.1;
-            if x_distance.pow(2) + y_distance.pow(2) > 4 {
-                tail_position.0 += x_distance / x_distance.abs();
-                tail_position.1 += y_distance / y_distance.abs();
-            } else {
-                tail_position.0 += x_distance / 2;
-                tail_position.1 += y_distance / 2;
+                let x_distance: i32 = first.0 - next.0;
+                let y_distance: i32 = first.1 - next.1;
+                if x_distance.pow(2) + y_distance.pow(2) > 4 {
+                    next.0 += x_distance / x_distance.abs();
+                    next.1 += y_distance / y_distance.abs();
+                } else {
+                    next.0 += x_distance / 2;
+                    next.1 += y_distance / 2;
+                }
             }
-            visited_positions.insert(tail_position);
+
+            short_visited.insert(positions[1]);
+            long_visited.insert(positions[9]);
         }
     }
-    println!("Part 1: {}", visited_positions.len());
+
+    println!("Part 1: {}", short_visited.len());
+    println!("Part 2: {}", long_visited.len());
     Ok(())
 }
