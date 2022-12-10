@@ -217,9 +217,20 @@ fn main() -> Result<()> {
     let mut signal_strength = 0;
 
     for i in 1.. {
+        let pixel_on_row = i % 40;
         if (i - 20) % 40 == 0 {
             signal_strength += i * x;
         }
+
+        if (x..x + 3).contains(&pixel_on_row) {
+            print!("#");
+        } else {
+            print!(".");
+        }
+        if pixel_on_row == 0 {
+            println!();
+        }
+
         if instruction.tick(&mut x) {
             if let Some(instr) = instructions.next() {
                 instruction = instr;
